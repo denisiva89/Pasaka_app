@@ -1,63 +1,65 @@
 // MockData.swift
+// Данные сказок - добавляй новые сюда
 import Foundation
 
 struct MockData {
-    // Сказка 1: Meža Garā ēna
-    static let novaPasakaStory: Story = {
-        let slides = (1...6).map { index in
-            let indexString = String(format: "%02d", index)
+    // Сказка 1: Zelta putns
+    static let zeltaPutnsStory: Story = {
+        let slides = (1...12).map { index in
             return Slide(
-                id: "nova_slide_\(indexString)",
-                imageName: "nova_slide\(indexString).png",
-                audioName: "nova_slide\(indexString)_audio.mp3"
+                id: "zelta_putns_slide_\(index)",
+                imageName: "zpi\(index).png",
+                audioName: "zpa\(index).mp3"
             )
         }
         return Story(
-            id: "nova_pasaka",
-            title: "Meža Garā ēna",
-            coverImage: "nova_pasaka_cover.png",
+            id: "zelta_putns",
+            title: "Zelta putns",
+            coverImage: "zelta_putns_cover.png",
             slides: slides,
             isPremium: false
         )
     }()
-    
-    // Сказка 2: Zalktis
-    static let zalktisStory: Story = {
+    // Сказка 2: Kas apēdis sieru
+        static let kasApedisSieruStory: Story = {
+            let slides = (1...13).map { index in
+                return Slide(
+                    id: "kas_apedis_sieru_slide_\(index)",
+                    imageName: "kasi\(index).png",
+                    audioName: "kasa\(index).mp3"
+                )
+            }
+            return Story(
+                id: "kas_apedis_sieru",
+                title: "Kas apēdis sieru",
+                coverImage: "kasapedissieru_cover.png",
+                slides: slides,
+                isPremium: false
+            )
+        }()
+    // ШАБЛОН для добавления новой сказки:
+    /*
+    static let exampleStory: Story = {
         let slides = (1...6).map { index in
             let indexString = String(format: "%02d", index)
             return Slide(
-                id: "zalktis_slide_\(indexString)",
-                imageName: "zalktis_slide\(indexString).png",
-                audioName: "zalktis_slide\(indexString)_audio.mp3"
+                id: "example_slide_\(indexString)",
+                imageName: "example_slide\(indexString).png",
+                audioName: "example_slide\(indexString)_audio.mp3"
             )
         }
         return Story(
-            id: "zalktis",
-            title: "Zalktis",
-            coverImage: "zalktis_cover.png",
+            id: "example_story",
+            title: "Название сказки",
+            coverImage: "example_cover.png",
             slides: slides,
             isPremium: false
         )
     }()
+    */
     
-    // Сказка 3: Trīs Sivēni
-    static let trisSiventiniStory: Story = {
-        let slides = (1...6).map { index in
-            let indexString = String(format: "%02d", index)
-            return Slide(
-                id: "tris_slide_\(indexString)",
-                imageName: "tris_slide\(indexString).png",
-                audioName: "tris_slide\(indexString)_audio.m4a"
-            )
-        }
-        return Story(
-            id: "tris_siventini",
-            title: "Trīs Sivēni",
-            coverImage: "tris_siventini_cover.png",
-            slides: slides,
-            isPremium: false
-        )
-    }()
-    
-    static let stories: [Story] = [novaPasakaStory, zalktisStory, trisSiventiniStory]
+    // Массив всех сказок (пока пустой)
+    static let stories: [Story] = [zeltaPutnsStory,kasApedisSieruStory
+        // Добавляй сюда: exampleStory, anotherStory, ...
+    ]
 }

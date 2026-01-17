@@ -21,15 +21,15 @@ enum NavigationDestination: Hashable {
 }
 
 struct MainView: View {
-
     @StateObject private var storyListViewModel: StoryListViewModel
-    @Environment(\.scenePhase) private var scenePhase
     @StateObject private var storyService: StoryService
     @StateObject private var audioService: AudioService
     @StateObject private var userProgressService: UserProgressService
+    
+    @Environment(\.scenePhase) private var scenePhase
     @State private var navigationPath = NavigationPath()
     @State private var showContinueOption = false
-    @State private var showEcecInfo = false
+    @State private var showParentInfo = false  // Исправлено имя переменной
     
     init() {
         let storyService = StoryService()
@@ -48,24 +48,23 @@ struct MainView: View {
     var body: some View {
         NavigationStack(path: $navigationPath) {
             ZStack {
-            Image("home_background")
-                                .resizable()
-                                .scaledToFill()
-                                .ignoresSafeArea()
+                // Background image
+                Image("home_background")
+                    .resizable()
+                    .scaledToFill()
+                    .ignoresSafeArea()
                 
                 VStack(spacing: 24) {
                     Spacer()
                     
-                    
-                    
                     VStack(spacing: 20) {
-                        // Основная кнопка "Начать"
+                        // Main "Start" button
                         PasakaButton(title: "Sākt") {
                             print("🎯 Нажата кнопка Sākt")
                             navigationPath.append("storyMenu")
                         }
                         
-                        // ДОБАВЛЕНО: кнопка "Продолжить" если есть сохраненный прогресс
+                        // "Continue" button if saved progress exists
                         if showContinueOption {
                             PasakaButton(title: "Turpināt") {
                                 print("🎯 Нажата кнопка Продолжить")
@@ -73,102 +72,63 @@ struct MainView: View {
                             }
                         }
                     }
-                    .offset(y: -40)
+                    .offset(x: 15, y: -60)
+                    
+                    // Parent info link
                     Button("Informācija vecākiem") {
-                        showEcecInfo = true
+                        showParentInfo = true
                     }
                     .font(.system(size: 16))
                     .foregroundColor(.gray)
                     .padding(.top, 4)
-                    .offset(y: +130)
-
+                    .offset(x: 15, y: 130)
                     
                     Spacer()
                 }
                 .padding()
             }
-            .overlay {
-                if showEcecInfo {
-                    ZStack {
-                        Color.black.opacity(0.4)
-                            .ignoresSafeArea()
-                            .transition(.opacity)
-                            .onTapGesture {
-                                showEcecInfo = false
-                            }
-
-                        VStack(alignment: .leading, spacing: 16) {
-                            HStack {
-                                Text("Informācija vecākiem")
-                                    .font(.headline)
-                                Spacer()
-                                Button(action: { showEcecInfo = false }) {
-                                    Image(systemName: "xmark")
-                                        .foregroundColor(.primary)
-                                }
-                                .accessibilityLabel("Aizvērt")
-                            }
-
-                            Text("Pasaka ir radīta kā mierīga un bērniem draudzīga lasīšanas pieredze.\n" +
-                                 "Lietotnē ir neliela latviešu pasaku kolekcija ar ilustrācijām un audio ierakstiem.\n" +
-                                 "Tajā nav reklāmu, ārējo saišu vai datu vākšanas.\n" +
-                                 "Bērns var lasīt vai klausīties savā tempā, izmantojot vienkāršu un saprotamu navigāciju, kas piemērota jaunākā vecuma lasītājiem.\n\n" +
-                                 "Pasakas mērķis ir veicināt valodas attīstību, iztēli un patstāvīgu lasīšanu drošā digitālā vidē.")
-                                .font(.body)
-                                .multilineTextAlignment(.leading)
-                        }
-                        .padding(24)
-                        .frame(maxWidth: min(UIScreen.main.bounds.width * 0.8, 600))
-                        .background(
-                            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .fill(Color(UIColor.systemBackground))
-                                .shadow(radius: 10)
-                        )
-                        .transition(.scale)
-                    }
-                }
-            }
             .navigationDestination(for: String.self) { route in
-                Group {
-                    if route == "storyMenu" {
-                        StoryMenuView(storyListViewModel: storyListViewModel, navigationPath: $navigationPath)
-                            .environmentObject(audioService)
-                    } else {
-                        EmptyView()
-                    }
+                if route == "storyMenu" {
+                    StoryMenuView(storyListViewModel: storyListViewModel, navigationPath: $navigationPath)
+                        .environmentObject(audioService)
                 }
             }
             .navigationDestination(for: NavigationDestination.self) { destination in
-                Group {
-                    switch destination {
-                    case .story(let story, let initialSlideIndex):
-                        SimpleStoryContainer(
-                            story: story,
-                            audioService: audioService,
-                            userProgressService: userProgressService,
-                            initialSlideIndex: initialSlideIndex
-                        )
-                    }
+                switch destination {
+                case .story(let story, let initialSlideIndex):
+                    SimpleStoryContainer(
+                        story: story,
+                        audioService: audioService,
+                        userProgressService: userProgressService,
+                        initialSlideIndex: initialSlideIndex
+                    )
                 }
             }
+            // ИСПРАВЛЕНО: только один overlay для parent info
             .overlay {
-                if showEcecInfo {
+                if showParentInfo {
                     ZStack {
                         Color.black.opacity(0.4)
                             .ignoresSafeArea()
                             .onTapGesture {
-                                showEcecInfo = false
+                                showParentInfo = false
                             }
 
                         InfoPopup(
                             title: "Informācija vecākiem",
-                            message: "Pasaka ir radīta kā mierīga un bērniem draudzīga lasīšanas pieredze.\n" +
-                                     "Lietotnē ir neliela latviešu pasaku kolekcija ar ilustrācijām un audio ierakstiem.\n" +
-                                     "Tajā nav reklāmu, ārējo saišu vai datu vākšanas.\n" +
-                                     "Bērns var lasīt vai klausīties savā tempā, izmantojot vienkāršu un saprotamu navigāciju, kas piemērota jaunākā vecuma lasītājiem.\n\n" +
-                                     "Pasakas mērķis ir veicināt valodas attīstību, iztēli un patstāvīgu lasīšanu drošā digitālā vidē.",
+                            message: """
+                            Pasaka ir radīta kā mierīga un bērniem draudzīga lasīšanas pieredze.
+                            
+                            Lietotnē ir neliela latviešu pasaku kolekcija ar ilustrācijām un audio ierakstiem.
+                            
+                            Tajā nav reklāmu, ārējo saišu vai datu vākšanas.
+                            
+                            Bērns var lasīt vai klausīties savā tempā, izmantojot vienkāršu un saprotamu navigāciju, kas piemērota jaunākā vecuma lasītājiem.
+                            
+                            Pasakas mērķis ir veicināt valodas attīstību, iztēli un patstāvīgu lasīšanu drošā digitālā vidē.
+                            """,
                             onClose: {
-                                showEcecInfo = false
+                                showParentInfo = false
                             }
                         )
                         .padding(.horizontal, 24)
@@ -183,7 +143,6 @@ struct MainView: View {
         }
     }
     
-    // ИСПРАВЛЕНО: не переходим автоматически, а показываем опцию
     private func checkSavedProgress() {
         if storyListViewModel.hasProgress(),
            let lastStoryId = storyListViewModel.getLastStoryId(),
@@ -195,7 +154,6 @@ struct MainView: View {
         }
     }
     
-    // ДОБАВЛЕНО: функция для продолжения с сохраненного места
     private func continueFromSavedProgress() {
         guard let lastStoryId = storyListViewModel.getLastStoryId(),
               let story = storyService.getStory(withId: lastStoryId) else {
@@ -208,7 +166,7 @@ struct MainView: View {
     }
 }
 
-// SimpleStoryContainer остается без изменений
+// MARK: - Simple Story Container
 struct SimpleStoryContainer: View {
     let story: Story
     let audioService: AudioService
@@ -236,6 +194,7 @@ struct SimpleStoryContainer: View {
     }
 }
 
+// MARK: - Info Popup
 private struct InfoPopup: View {
     let title: String
     let message: String

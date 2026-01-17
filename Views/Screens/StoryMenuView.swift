@@ -43,26 +43,20 @@ struct StoryMenuView: View {
                             }
                         }
                         .padding(.horizontal, 40)
-                        .padding(.top, 130) // Increased - cards lower
+                        .padding(.top, 130)
                         .padding(.bottom, 40)
                     }
                 }
             }
 
-            // Back button overlay
+            // Back button overlay - ОБНОВЛЁННЫЙ СТИЛЬ
             VStack {
                 HStack {
-                    Button {
+                    BackButton3D {
                         navigationPath.removeLast()
-                    } label: {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 20, weight: .semibold))
-                            .foregroundColor(.primary)
-                            .padding(14)
-                            .background(.ultraThinMaterial, in: Circle())
                     }
                     .padding(.leading, 24)
-                    .padding(.top, 70) // Back button also lower
+                    .padding(.top, 70)
                     
                     Spacer()
                 }
@@ -79,7 +73,57 @@ struct StoryMenuView: View {
     }
 }
 
+// MARK: - Back Button 3D (такой же стиль как в SlideView)
+
+private struct BackButton3D: View {
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: "chevron.left")
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundColor(.white)
+                .frame(width: 38, height: 38)
+                .background(
+                    ZStack {
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    colors: [
+                                        Color.black.opacity(0.3),
+                                        Color.black.opacity(0.5)
+                                    ],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            )
+                        
+                        Circle()
+                            .fill(.ultraThinMaterial)
+                        
+                        Circle()
+                            .stroke(
+                                LinearGradient(
+                                    colors: [
+                                        Color.white.opacity(0.4),
+                                        Color.white.opacity(0.1),
+                                        Color.clear
+                                    ],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                ),
+                                lineWidth: 1
+                            )
+                    }
+                )
+                .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 // MARK: - Story Card View
+
 private struct StoryCardView: View {
     let story: Story
     let onSelect: () -> Void
